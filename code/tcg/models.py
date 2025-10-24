@@ -2,11 +2,6 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
 
-
-# ============================================================
-# MODELOS PRINCIPAIS
-# ============================================================
-
 class Endereco(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enderecos")
     rua = models.CharField(max_length=255)
@@ -57,13 +52,6 @@ class Carta(models.Model):
 
 
 
-
-
-
-# ============================================================
-# CARRINHO DE COMPRAS
-# ============================================================
-
 class Carrinho(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="carrinho")
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -89,9 +77,7 @@ class ItemCarrinho(models.Model):
         return f"{self.carta.nome} x {self.quantidade}"
 
 
-# ============================================================
-# PEDIDOS E PAGAMENTOS
-# ============================================================
+
 
 class Pedido(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pedidos")

@@ -53,7 +53,7 @@ class Carta(models.Model):
     raridade = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.nome} - {self.condicao})"
+        return f"{self.nome} - {self.condicao} - {self.preco})"
 
 
 

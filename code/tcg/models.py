@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import UniqueConstraint, Q
 
 class Endereco(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enderecos")
@@ -53,7 +54,7 @@ class Carta(models.Model):
 
 
 class Carrinho(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="carrinho")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carrinho")
     data_criacao = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=[
         ("aberto", "Aberto"),
@@ -62,6 +63,14 @@ class Carrinho(models.Model):
 
     def __str__(self):
         return f"Carrinho de {self.usuario.username}"
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=['usuario'], 
+                condition=Q(status='aberto'), 
+                name='unique_open_cart_per_user'
+            )
+        ]
 
 
 class ItemCarrinho(models.Model):

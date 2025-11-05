@@ -55,13 +55,15 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tcg.context_processors.cart_item_count_processor',
             ],
         },
     },
@@ -117,6 +119,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# NOVO: Esta linha permite que o Django encontre o seu /static/js/cart.js
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Default primary key field type
+# ...
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

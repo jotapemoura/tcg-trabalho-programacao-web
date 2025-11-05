@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalhes da Carta: {{ carta.nome }} - CardShop TCG{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        
+        <div class="col-md-5">
+            <img src="{{ carta.imagem_url }}" 
+                 onerror="this.onerror=null;this.src='https://via.placeholder.com/400x600?text=Card';"
+                 class="img-fluid rounded shadow-lg" 
+                 alt="{{ carta.nome }}"
+                 style="max-height: 600px; object-fit: cover;">
+        </div>
+        
+        <div class="col-md-7 mt-4 mt-md-0">
+            <h1 class="display-5 fw-bold text-primary">{{ carta.nome }}</h1>
+            <p class="lead text-muted">{{ carta.categoria.get_nome_display }}</p>
+
+            <hr>
+
+            <div class="mb-3">
+                <span class="fs-3 fw-bold text-danger">R$ {{ carta.preco|stringformat:".2f" }}</span>
+            </div>
+
+            <h5 class="mt-4">Descrição</h5>
+            <p>{{ carta.descricao|default:"Nenhuma descrição detalhada disponível para esta carta." }}</p>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <p class="mb-1"><small class="fw-bold">Condição:</small> {{ carta.get_condicao_display }}</p>
+                    <p class="mb-1"><small class="fw-bold">Edição:</small> {{ carta.edicao|default:"N/A" }}</p>
+                </div>
+                <div class="col-sm-6">
+                    <p class="mb-1"><small class="fw-bold">Raridade:</small> {{ carta.raridade|default:"N/A" }}</p>
+                    <p class="mb-1">
+                        <small class="fw-bold">Em Estoque:</small> 
+                        {% if carta.estoque > 5 %}
+                            <span class="text-success">{{ carta.estoque }}</span>
+                        {% elif carta.estoque > 0 %}
+                            <span class="text-warning">{{ carta.estoque }} (Baixo)</span>
+                        {% else %}
+                            <span class="text-danger">Esgotado</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <form method="POST" action="{% url 'tcg:add_item' %}" class="mb-4">
+                {% csrf_token %}
+                
+                <input type="hidden" name="cartaId" value="{{ carta.id }}">
+
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label for="quantity-input" class="form-label visually-hidden">Quantidade</label>
+                        <input 
+                            type="number" 
+                            class="form-control form-control-sm text-center" 
+                            id="quantity-input" 
+                            name="quantity" 
+                            value="1" 
+                            min="1" 
+                            max="{{ carta.estoque }}" 
+                            {% if carta.estoque == 0 %}disabled{% endif %}
+                            style="width: 70px;">
+                    </div>
+
+                    <div class="col-auto">
+                        {% if carta.estoque > 0 %}
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-cart-plus me-1"></i> Adicionar ao Carrinho
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-danger btn-lg" disabled>
+                                Esgotado
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+            
+            <div class="mt-3 text-center">
+                <a href="{% url 'tcg:store' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Voltar para a Loja
+                </a>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-3">Avaliações de Clientes</h3>
+            <div class="alert alert-info">
+                Funcionalidade de avaliações a ser implementada em breve!
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

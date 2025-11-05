@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login - CardShop TCG{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h3 class="mb-0">Acessar CardShop</h3>
+            </div>
+            <div class="card-body p-4">
+                
+                {# Exibe mensagens de erro/sucesso do Django (ex: senha inválida) #}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post" action="{% url 'tcg:login' %}"> 
+                    {% csrf_token %} 
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuário ou E-mail</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-danger btn-lg">Entrar</button>
+                    </div>
+                </form>
+                
+                <p class="text-center mt-3">
+                    Ainda não tem conta? <a href="{% url 'tcg:register' %}" class="text-primary fw-bold">Cadastre-se aqui</a>.
+                </p>
+                
+                <p class="text-center">
+                    <a href="#" class="text-muted small">Esqueceu a senha?</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

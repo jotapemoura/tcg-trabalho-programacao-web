@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout - CardShop TCG{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<h1 class="mb-4 text-primary"><i class="fas fa-credit-card me-2"></i> Finalizar Compra</h1>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm p-4">
+            <h5 class="card-title text-danger mb-3">1. Detalhes da Entrega</h5>
+            
+            <form id="shipping-form" method="POST" action="{% url 'tcg:process_order' %}">
+                {% csrf_token %} {% if enderecos %}
+                    {% for endereco in enderecos %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="endereco_selecionado" id="endereco_{{ endereco.id }}" value="{{ endereco.id }}" {% if forloop.first %}checked{% endif %} required>
+                        <label class="form-check-label" for="endereco_{{ endereco.id }}">
+                            <span class="fw-bold">{{ endereco.rua }}</span> - {{ endereco.cidade }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="alert alert-warning">Nenhum endereço cadastrado. Por favor, adicione um endereço.</p>
+                {% endif %}
+                
+                <hr>
+                
+                <h5 class="card-title text-danger mb-3">2. Informações de Pagamento</h5>
+                <div class="mb-3">
+                    <label for="metodo_pagamento" class="form-label">Método de Pagamento</label>
+                    <select class="form-select" id="metodo_pagamento">
+                        <option selected>Selecione</option>
+                        <option value="cartao">Cartão de Crédito/Débito</option>
+                        <option value="boleto">Boleto Bancário</option>
+                        <option value="pix">PIX</option>
+                    </select>
+                </div>
+                
+                <div id="card-details" class="card p-3 bg-light mt-3">
+                    <div class="mb-3">
+                        <label for="numero_cartao" class="form-label">Número do Cartão</label>
+                        <input type="text" class="form-control" id="numero_cartao" placeholder="XXXX XXXX XXXX XXXX">
+                    </div>
+                </div>
+                
+            </form> </div>
+    </div>
+    
+    <div class="col-lg-5">
+        <div class="card shadow-lg bg-light sticky-top" style="top: 20px;">
+            <div class="card-header fw-bold bg-danger text-white">Seu Pedido</div>
+            <div class="card-body">
+                <p class="text-muted small">Resumo do Carrinho</p>
+                
+                {% if total_carrinho %}
+                    <div class="d-flex justify-content-between">
+                        <span>Subtotal:</span>
+                        <span class="fw-bold">R$ {{ total_carrinho|stringformat:".2f" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Frete:</span>
+                        <span class="fw-bold">R$ {{ taxa_entrega|stringformat:".2f" }}</span>
+                    </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between fs-3 mt-3">
+                    <span>Total a Pagar:</span>
+                    <span class="fw-bold text-success">R$ {{ valor_final|stringformat:".2f" }}</span>
+                </div>
+                
+                <hr>
+                
+                {% if enderecos %}
+                    <button type="submit" form="shipping-form" class="btn btn-success btn-lg w-100 mt-2">
+                        <i class="fas fa-lock me-2"></i> Pagar e Finalizar
+                    </button>
+                {% else %}
+                    <a href="{% url 'tcg:profile' %}" class="btn btn-secondary btn-lg w-100 mt-2">
+                         <i class="fas fa-exclamation-triangle me-2"></i> Cadastrar Endereço
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% block scripts_extra %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentMethod = document.getElementById('metodo_pagamento');
+        const cardDetails = document.getElementById('card-details');
+
+        // Função para mostrar/ocultar detalhes do cartão
+        function toggleCardDetails() {
+            if (paymentMethod.value === 'cartao') {
+                // Mostra os detalhes do cartão
+                cardDetails.style.display = 'block';
+                // Adiciona 'required' (melhora a UX)
+                cardDetails.querySelectorAll('input').forEach(input => input.required = true);
+            } else {
+                // Oculta os detalhes do cartão para PIX, Boleto, Selecione
+                cardDetails.style.display = 'none';
+                // Remove 'required' para evitar problemas na submissão
+                cardDetails.querySelectorAll('input').forEach(input => input.required = false);
+            }
+        }
+
+        // 1. Inicializa a visibilidade no carregamento da página
+        toggleCardDetails();
+
+        // 2. Escuta a mudança no seletor
+        paymentMethod.addEventListener('change', toggleCardDetails);
+    });
+</script>
+{% endblock scripts_extra %}
+{% endblock content %}

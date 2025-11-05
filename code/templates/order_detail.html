@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalhes do Pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-primary">
+        <i class="fas fa-receipt me-2"></i> Detalhes do Pedido <span class="text-danger">#{{ pedido.id }}</span>
+    </h1>
+
+    <div class="card shadow-lg p-4 mb-4">
+        <div class="row">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="text-secondary"><i class="fas fa-calendar-alt me-2"></i> Data do Pedido</h5>
+                <p class="fw-bold">{{ pedido.data_pedido|date:"d/m/Y \à\s H:i" }}</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="text-secondary"><i class="fas fa-money-check-alt me-2"></i> Total Pago</h5>
+                <p class="fw-bold text-success fs-4">R$ {{ pedido.valor_total|stringformat:".2f" }}</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-secondary"><i class="fas fa-info-circle me-2"></i> Status</h5>
+                <p class="fw-bold">
+                    <span class="badge 
+                        {% if pedido.status == 'processando' %}bg-warning text-dark
+                        {% elif pedido.status == 'enviado' %}bg-info
+                        {% elif pedido.status == 'entregue' %}bg-success
+                        {% elif pedido.status == 'cancelado' %}bg-danger
+                        {% else %}bg-secondary{% endif %}
+                        fs-6">
+                        {{ pedido.status|capfirst }}
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Endereço -->
+    <div class="card shadow-sm p-4 mb-4">
+        <h3 class="text-danger mb-3"><i class="fas fa-map-marker-alt me-2"></i> Endereço de Entrega</h3>
+        {% with endereco=pedido.endereco %}
+            {% if endereco %}
+                <p class="mb-1 fw-bold">{{ endereco.rua }}, {{ endereco.complemento }}</p>
+                <p class="mb-1">{{ endereco.cidade }} - {{ endereco.estado }}, CEP: {{ endereco.cep }}</p>
+                <small class="text-muted">Este é o endereço registrado no momento da compra.</small>
+            {% else %}
+                <p class="text-danger">Endereço de entrega não registrado.</p>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Seção de Itens -->
+    <div class="card shadow-sm p-4">
+        <h3 class="text-danger mb-3"><i class="fas fa-box-open me-2"></i> Itens do Pedido</h3>
+        
+        <ul class="list-group list-group-flush">
+            {% for item in pedido.itempedido_set.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="{{ item.carta.imagem_url }}" 
+                        onerror="this.onerror=null;this.src='https://via.placeholder.com/50x75?text=Card';"
+                        alt="{{ item.carta.nome }}" 
+                        class="img-fluid me-3 rounded" 
+                        style="width: 50px; height: 75px; object-fit: cover;">
+
+                    <div>
+                        <span class="fw-bold">{{ item.quantidade }}x</span> 
+                        {{ item.carta.nome }}
+                        <small class="text-muted d-block">Preço Pago: R$ {{ item.preco_unitario|stringformat:".2f" }}</small>
+                    </div>
+                </div>
+                <span class="fw-bold fs-5 text-primary">R$ {{ item.subtotal|stringformat:".2f" }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        
+        <div class="mt-4 text-end">
+            <h5 class="d-block fw-bold text-dark">Total do Pedido: R$ {{ pedido.valor_total|stringformat:".2f" }}</h5>
+            <small class="text-muted">Inclui frete e taxas aplicadas no momento da compra.</small>
+        </div>
+    </div>
+    
+    <div class="mt-4 text-center">
+        <a href="{% url 'tcg:orders' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar para Pedidos
+        </a>
+    </div>
+
+</div>
+{% endblock content %}

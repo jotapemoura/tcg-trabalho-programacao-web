@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meu Perfil - CardShop TCG{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-primary"><i class="fas fa-user-circle me-2"></i> Minha Conta</h1>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="list-group shadow-sm">
+                <a href="{% url 'tcg:profile' %}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-id-card me-2"></i> Informações Pessoais
+                </a>
+                <a href="{% url 'tcg:orders' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-receipt me-2"></i> Histórico de Pedidos
+                </a>
+                <a href="{% url 'tcg:logout' %}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i> Sair
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm p-4 mb-4">
+                <h5 class="card-title text-success mb-3">Editar Informações Pessoais</h5>
+                
+                <form method="POST" action="{% url 'tcg:profile' %}">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">Nome:</label>
+                            <input type="text" class="form-control" id="id_first_name" name="first_name" value="{{ user.first_name|default:'' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Sobrenome:</label>
+                            <input type="text" class="form-control" id="id_last_name" name="last_name" value="{{ user.last_name|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">E-mail (Usado para Login):</label>
+                        <input type="email" class="form-control" id="id_email" name="email" value="{{ user.email }}" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-3">Salvar Alterações</button>
+                    <a href="#" class="btn btn-outline-secondary mt-3">Alterar Senha (Futuro)</a>
+                </form>
+            </div>
+            
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title text-info mb-3">Meus Endereços</h5>
+                
+                {% if enderecos %}
+                    {% for endereco in enderecos %}
+                        <div class="border p-3 mb-2 rounded bg-light">
+                            <p class="fw-bold mb-1">{{ endereco.rua }}, {{ endereco.cidade }} - {{ endereco.estado }}</p>
+                            <small>{{ endereco.complemento }} - CEP: {{ endereco.cep }}</small>
+                            <a href="{% url 'tcg:edit_address_page' endereco.id %}" 
+                                class="btn btn-sm btn-outline-secondary float-end">
+                                Editar
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning">
+                        Nenhum endereço cadastrado. O checkout exige um endereço.
+                    </div>
+                {% endif %}
+                <a href="#" class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+    <i class="fas fa-plus me-2"></i> Adicionar Novo Endereço
+</a>
+
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'tcg:add_address' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Cadastrar Novo Endereço</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_rua" class="form-label">Rua e Número *</label>
+                        <input type="text" class="form-control" id="id_rua" name="rua" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_cidade" class="form-label">Cidade *</label>
+                            <input type="text" class="form-control" id="id_cidade" name="cidade" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_estado" class="form-label">Estado (UF) *</label>
+                            <input type="text" class="form-control" id="id_estado" name="estado" required maxlength="2">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_cep" class="form-label">CEP *</label>
+                        <input type="text" class="form-control" id="id_cep" name="cep" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_complemento" class="form-label">Complemento / Referência</label>
+                        <input type="text" class="form-control" id="id_complemento" name="complemento">
+                    </div>
+                    <small class="text-danger">* Campos obrigatórios</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar Endereço</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

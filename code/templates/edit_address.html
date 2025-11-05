@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar Endereço - CardShop TCG{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4 text-primary"><i class="fas fa-edit me-2"></i> Editar Endereço</h1>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title text-success mb-3">Endereço #{{ endereco.id }}</h5>
+                
+                <form method="POST" action="{% url 'tcg:save_edit_address' endereco.id %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_rua" class="form-label">Rua e Número *</label>
+                        <input type="text" class="form-control" id="id_rua" name="rua" value="{{ endereco.rua }}" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_cidade" class="form-label">Cidade *</label>
+                            <input type="text" class="form-control" id="id_cidade" name="cidade" value="{{ endereco.cidade }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_estado" class="form-label">Estado (UF) *</label>
+                            <input type="text" class="form-control" id="id_estado" name="estado" value="{{ endereco.estado }}" required maxlength="2">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_cep" class="form-label">CEP *</label>
+                        <input type="text" class="form-control" id="id_cep" name="cep" value="{{ endereco.cep }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_complemento" class="form-label">Complemento / Referência</label>
+                        <input type="text" class="form-control" id="id_complemento" name="complemento" value="{{ endereco.complemento|default:'' }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">Salvar Alterações</button>
+                    <a href="{% url 'tcg:profile' %}" class="btn btn-outline-secondary mt-3">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

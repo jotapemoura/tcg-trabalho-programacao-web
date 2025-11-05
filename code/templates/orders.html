@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meus Pedidos - CardShop TCG{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4 text-primary"><i class="fas fa-receipt me-2"></i> Histórico de Pedidos</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="list-group shadow-sm">
+            <a href="{% url 'tcg:profile' %}" class="list-group-item list-group-item-action">
+                <i class="fas fa-id-card me-2"></i> Informações Pessoais
+            </a>
+            <a href="{% url 'tcg:orders' %}" class="list-group-item list-group-item-action active">
+                Histórico de Pedidos
+            </a>
+            <a href="{% url 'tcg:logout' %}" class="list-group-item list-group-item-action text-danger">
+                <i class="fas fa-sign-out-alt me-2"></i> Sair
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card shadow-sm p-4">
+            <h5 class="card-title text-primary mb-3">Meus Pedidos Recentes</h5>
+            
+            {% if pedidos %}
+                {% for pedido in pedidos %}
+                <div class="list-group-item list-group-item-action mb-3 border rounded">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 fw-bold">Pedido #{{ pedido.id }}</h6>
+                        <small class="{% if pedido.status == 'pago' %}text-success{% elif pedido.status == 'pendente' %}text-warning{% else %}text-danger{% endif %} fw-bold">
+                            {{ pedido.get_status_display }}
+                        </small>
+                    </div>
+                    <p class="mb-1 small">Data: {{ pedido.data_pedido|date:"d/m/Y H:i" }} | Total: R$ {{ pedido.valor_total|stringformat:".2f" }}</p>
+                    <small class="text-muted">Itens: {{ pedido.itens.count }} tipos de cartas.</small>
+                    a href="{% url 'tcg:order_detail' pedido.id %}" class="btn btn-sm btn-info">
+                        Detalhes
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                 <div class="alert alert-info text-center" role="alert">
+                    Você ainda não realizou nenhum pedido.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
